@@ -4,7 +4,141 @@
 <head>
     <meta charset="UTF-8">
     <title>Login | Apni Book</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        /* Reset some defaults */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #6C63FF, #9F7FFF);
+            color: #333;
+        }
+
+        .auth-container {
+            background: #fff;
+            padding: 40px 50px;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-container h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            color: #6C63FF;
+        }
+
+        .auth-container form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-container input {
+            padding: 12px 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-container input:focus {
+            border-color: #6C63FF;
+            box-shadow: 0 0 8px rgba(108, 99, 255, 0.4);
+            outline: none;
+        }
+
+        .auth-container button {
+            padding: 12px;
+            background: #6C63FF;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+
+        .auth-container button:hover {
+            background: #574fd1;
+            transform: translateY(-2px);
+        }
+
+        .auth-container p {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .auth-container p a {
+            color: #6C63FF;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .auth-container p a:hover {
+            color: #574fd1;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 400px) {
+            .auth-container {
+                width: 90%;
+                padding: 30px 20px;
+            }
+        }
+
+        /* Notification styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #6C63FF;
+            color: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: slideIn 0.5s forwards, fadeOut 0.5s 3.5s forwards;
+            z-index: 1000;
+        }
+
+        /* Slide in from top */
+        @keyframes slideIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Fade out after delay */
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+        }
+    </style>
+
 </head>
 
 <body>
@@ -17,7 +151,12 @@
         </form>
         <p>Don’t have an account? <a href="/signup">Sign up</a></p>
     </div>
-    <script src="/js/script.js"></script>
+    <% if (typeof message !=='undefined' ) { %>
+        <div id="notification" class="notification">
+            <%= message %>
+        </div>
+        <% } %>
+            <script src="/js/script.js"></script>
 </body>
 
 </html>

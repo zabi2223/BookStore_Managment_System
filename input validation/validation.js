@@ -9,14 +9,13 @@ export const bookValidation = z.object({
 });
 
 export const userValidation = z.object({
-    name: z.string().min(3).max(50),
+    name: z.string().min(3).max(30),
     email: z.string().email(),
     password: z.string().min(8).max(20),
-    books: z.array(bookValidation).optional(),
 });
 
 
 export const loginValidation = z.object({
     email: z.string().email(),
-    password: z.string().min(4).max(20),
+    password: z.string().min(8).max(20),
 });

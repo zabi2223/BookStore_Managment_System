@@ -1,32 +1,31 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const newPass = document.getElementById("newPassword");
-    const confirmPass = document.getElementById("confirmPassword");
-    const message = document.getElementById("passwordMessage");
+const notification = document.getElementById('notification');
+if (notification) {
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
 
-    if (newPass && confirmPass && message) {
-        confirmPass.addEventListener("input", () => {
-            if (newPass.value.length < 8) {
-                message.textContent = "Password must be at least 8 characters.";
-                message.style.color = "red";
-            } else if (newPass.value !== confirmPass.value) {
-                message.textContent = "Passwords do not match.";
-                message.style.color = "red";
-            } else {
-                message.textContent = "Passwords match ✅";
-                message.style.color = "green";
-            }
+if (window.location.search.includes('message=')) {
+    const newURL = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newURL);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const profileBtn = document.querySelector('.profile-btn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // prevent closing immediately
+            profileDropdown.classList.toggle('show');
         });
-    }
 
-    // Profile Image Change Preview
-    const newPic = document.getElementById("newPic");
-    const profileImg = document.getElementById("profileImg");
-    if (newPic && profileImg) {
-        newPic.addEventListener("change", (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                profileImg.src = URL.createObjectURL(file);
-            }
+        // Close dropdown if clicked outside
+        document.addEventListener('click', () => {
+            profileDropdown.classList.remove('show');
         });
     }
 });

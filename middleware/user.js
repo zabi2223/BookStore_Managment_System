@@ -6,10 +6,9 @@ export const isUserLoggedIn = (req, res, next) => {
         return res.redirect("/");
     }
     try {
-        const decoded = jwt.verify(token, "jwtSecretKey");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
 
         req.userId = decoded.userId;
-        req.userName = decoded.name;
         next();
     } catch (error) {
         return res.redirect("/");

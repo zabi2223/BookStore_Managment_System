@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>Profile | Apni Book</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        write style code
+    </style>
 </head>
 
 <body>
@@ -13,7 +15,7 @@
             <div class="profile-pic">
                 <img src="<%= user.pic || '/images/default-profile.png' %>" alt="Profile" id="profileImg">
                 <label for="newPic" class="edit-icon">✏️</label>
-                <input type="file" id="newPic" name="pic" accept="image/*" hidden>
+                <input type="file" id="newPic" name="pic" accept="image" hidden>
             </div>
 
             <form action="/updateProfile" method="POST" enctype="multipart/form-data">

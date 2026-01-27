@@ -1,11 +1,13 @@
-import User from "../models/userBooks.js";
+import { User, Book } from "../models/userBooks.js";
 import bcrypt from 'bcryptjs';
-import { userValidation, loginValidation } from "../inputValidate/userValidate.js";
+import { userValidation, loginValidation } from "../input validation/validation.js";
 import sanitizeHtml from "sanitize-html";
+import jwt from "jsonwebtoken";
 
 export const loginPage = async (req, res) => {
     try {
-        res.render("login");
+        const message = req.query.message;
+        res.render("login", { message });
     } catch (error) {
         console.error(error);
         res.send("Something went wrong");
@@ -18,7 +20,7 @@ export const loginUser = async (req, res) => {
         const result = loginValidation.safeParse(req.body);
 
         if (!result.success) {
-            const errorMessages = result.error.errors.map(err => err.message).join(", ");
+            const errorMessages = result.error.issues.map(err => `${err.path[0]}: ${err.message}`).join(", ");
             return res.redirect("/?message=" + encodeURIComponent(errorMessages));
         }
 
@@ -27,24 +29,30 @@ export const loginUser = async (req, res) => {
         const cleanEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
         const cleanPassword = sanitizeHtml(password, { allowedTags: [], allowedAttributes: {} });
 
-        const user = await findUserByEmail(cleanEmail);
+        const user = await User.findOne({ email: cleanEmail });
+
         if (!user) {
             return res.redirect("/?message=" + encodeURIComponent("User not exist"));
         }
 
-        const match = await verifyPassword(cleanPassword, user.password);
+        const match = await bcrypt.compare(cleanPassword, user.password);
         if (!match) {
             return res.redirect("/?message=" + encodeURIComponent("Password Incorrect"));
         }
 
-        // const token = complete it;
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET_KEY,
+            { expiresIn: "1h" }
+        );
+
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
             maxAge: 60 * 60 * 1000,
         });
 
-        res.redirect("/home");
+        res.redirect("/home?message=" + encodeURIComponent("Welcome"));
 
     } catch (error) {
         console.error(error);
@@ -55,7 +63,8 @@ export const loginUser = async (req, res) => {
 
 export const signUpPage = async (req, res) => {
     try {
-        res.render("signup");
+        const message = req.query.message;
+        res.render("signup", { message });
 
     } catch (error) {
         console.error(error);
@@ -70,7 +79,7 @@ export const createUser = async (req, res) => {
         const result = userValidation.safeParse(req.body);
 
         if (!result.success) {
-            const errorMessages = result.error.errors.map(err => err.message).join(", ");
+            const errorMessages = result.error.issues.map(err => `${err.path[0]}: ${err.message}`).join(", ");
             return res.redirect(`/signup?message=${encodeURIComponent(errorMessages)}`);
         }
 
@@ -80,7 +89,8 @@ export const createUser = async (req, res) => {
         const cleanEmail = sanitizeHtml(email, { allowedTags: [], allowedAttributes: {} });
         const cleanPassword = sanitizeHtml(password, { allowedTags: [], allowedAttributes: {} });
 
-        // const existUser = check;
+        const existUser = await User.findOne({ email: cleanEmail });
+
         if (existUser) {
             return res.redirect('/signup?message=' + encodeURIComponent('Email already registered'));
         }
@@ -106,39 +116,35 @@ export const logout = async (req, res) => {
 export const homePage = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const { user, totalPages } = await getUserWithTasks(req.userId, page);
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+        const user = await User.findById(req.userId)
+            .populate({
+                path: "books",
+                options: { skip, limit, sort: { publishedDate: -1 } }
+            })
+            .exec();
 
         if (!user) return res.redirect('/?message=User+not+found');
 
-        res.render("user/homePage", {
+        const totalBooks = user.books.length;
+        const totalPages = Math.ceil(totalBooks / limit);
+
+        const message = req.query.message;
+
+        res.render("home", {
             user: {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                tasks: user.tasks
+                books: user.books
             },
-            page,
-            totalPages
+            books: user.books,
+            currentPage: page,
+            totalPages,
+            message
         });
-
-    } catch (error) {
-        console.error(error);
-        res.send("Something went wrong");
-    }
-};
-
-export const updateStatus = async (req, res) => {
-    try {
-        const { taskId } = req.params;
-        const { status } = req.body;
-        const page = parseInt(req.query.page) || 1;
-
-        const result = await updateTaskStatus(req.userId, taskId, status);
-        if (result.error) {
-            return res.redirect(`/homePage?page=${page}&message=${result.error}`);
-        }
-
-        res.redirect(`/homePage?page=${page}`);
 
     } catch (error) {
         console.error(error);

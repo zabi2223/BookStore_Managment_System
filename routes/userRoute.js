@@ -6,7 +6,7 @@ import {
     loginUser,
     logout,
     signUpPage,
-} from "../controllers/userControllers.js";
+} from "../controllers/userController.js";
 import { isUserLoggedIn } from "../middleware/user.js";
 
 const route = express.Router();
@@ -21,6 +21,6 @@ route.post('/signup', createUser);
 
 route.post('/logout', isUserLoggedIn, logout);
 
-route.get('/homePage', isUserLoggedIn, homePage);
+route.get('/home', isUserLoggedIn, homePage);
 
 export default route;
