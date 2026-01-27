@@ -70,7 +70,7 @@ The frontend uses **EJS templates**, with a **single CSS** and **JavaScript** fi
 |-------|-------------|
 | **Backend** | Node.js, Express.js |
 | **Frontend (Views)** | EJS Templates, CSS, JavaScript |
-| **Database** | MongoDB (Mongoose) |
+| **Database** | MongoDB (mongoose), AWS S3 (for pics upload) |
 | **Validation** | Zod |
 | **Authentication** | JSON Web Tokens (JWT), bcryptjs |
 | **Security** | Helmet, sanitize-html |
