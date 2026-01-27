@@ -91,6 +91,54 @@ The frontend uses **EJS templates**, with a **single CSS** and **JavaScript** fi
 
 ## 🗃️ Folder Structure
 
+BOOKSTORE_API/
+│
+├── controllers/
+│   └── userController.js
+│
+├── db config/
+│   └── db.js
+│
+├── input validation/
+│   └── validation.js
+│
+├── middleware/
+│   └── user.js
+│
+├── models/
+│   └── userBooks.js
+│
+├── node_modules/
+│
+├── public/
+│   ├── css/
+│   │   └── style.css
+│   │
+│   ├── images/
+│   │   └── default-profile.png
+│   │
+│   └── js/
+│       └── script.js
+│
+├── routes/
+│   └── userRoute.js
+│
+├── views/
+│   ├── partails/
+│   │   ├── footer.ejs
+│   │   ├── header.ejs
+│   │   ├── addForm.ejs
+│   │   ├── Edit.ejs
+│   │   ├── home.ejs
+│   │   ├── login.ejs
+│   │   ├── profile.ejs
+│   │   └── signup.ejs
+│
+├── .env
+├── app.js
+├── package-lock.json
+└── package.json
+
 
 ---
 
