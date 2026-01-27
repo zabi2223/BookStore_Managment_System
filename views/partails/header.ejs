@@ -1,0 +1,14 @@
+<header class="header">
+    <div class="logo">📚 Apni Book</div>
+    <% if (user) { %>
+        <div class="search-bar">
+            <form action="/search" method="GET">
+                <input type="text" name="query" placeholder="Search by title, author, ID">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+        <div class="profile-btn">
+            <a href="/profile"><img src="<%= user.pic || '/images/default-profile.png' %>" alt="Profile"></a>
+        </div>
+        <% } %>
+</header>

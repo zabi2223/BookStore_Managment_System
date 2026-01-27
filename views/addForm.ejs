@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Add Book</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+    <%- include('partials/header') %>
+        <div class="form-container">
+            <h2>Add New Book</h2>
+            <form action="/addBook" method="POST">
+                <input type="text" name="title" placeholder="Title" required>
+                <input type="text" name="author" placeholder="Author" required>
+                <input type="date" name="publishedDate" required>
+                <input type="text" name="uniqueId" placeholder="Unique ID" required>
+                <button type="submit">Add Book</button>
+            </form>
+        </div>
+        <script src="/js/script.js"></script>
+</body>
+
+</html>
