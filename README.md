@@ -187,6 +187,7 @@ npx nodemon app.js
   "sanitize-html": "^2.17.0",
   "zod": "^4.3.6"
 }
+```
 
 ---
 
