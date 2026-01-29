@@ -292,6 +292,7 @@
                             <th>Title</th>
                             <th>Author</th>
                             <th>Published</th>
+                            <th>Price</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -309,6 +310,9 @@
                                 </td>
                                 <td>
                                     <%= book.publishedDate.toDateString() %>
+                                </td>
+                                <td>
+                                    <%= book.price %>
                                 </td>
                                 <td>
                                     <a href="/editBook/<%= book._id %>" class="edit-btn">Edit</a>

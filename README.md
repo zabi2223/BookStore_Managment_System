@@ -1,86 +1,67 @@
 # 📚 Book Store Management System (MVC – Node.js, Express.js, MongoDB, EJS)
 
-A modern web-based platform to manage and organize books efficiently, built using **Node.js**, **Express.js**, and **MongoDB**, following the **MVC (Model-View-Controller)** architecture.  
-It provides a user-friendly interface for managing books, including **authentication, search, filtering, pagination, and profile management**.  
-The frontend uses **EJS templates**, with a **single CSS** and **JavaScript** file shared across all pages.
+A modern web-based platform to manage and organize books efficiently, built using **Node.js**, **Express.js**, and **MongoDB**, following the **MVC (Model-View-Controller)** architecture.
+It provides a user-friendly interface for managing books, including **authentication, search, filtering, and profile management**.
+The frontend uses **EJS templates**, with shared **CSS** and **JavaScript** across all pages.
 
 ---
 
-## 🧩 Features
+## 🚀 Features
 
-### 🔐 Login Page
-- Login using **email** and **password**  
-- Redirects to signup if the user doesn’t have an account  
-- Validation for incorrect credentials
-- Forget password option
+### 🔐 Authentication & User Management
 
-### 📝 Signup Page
-- Create a new account with **name, email, and password**  
-- Redirect to login if the user already has an account  
-- Password validation for security  
+* User **Signup** (Name, Email, Password)
+* User **Login** (Email, Password)
+* **Forgot Password** (Reset link sent to email)
+* **Reset Password** using secure token link
 
-### 🏠 Home Page
-- Modern design featuring **Book Store logo** (“Apni Book”)  
-- Displays all books in a **paginated table** showing:
-  - Title  
-  - Author  
-  - Published Date  
-  - Unique ID  
-- Each book includes:  
-  - ✏️ **Edit Button**  
-  - 🗑️ **Delete Button**  
-- **Add Book Button** at the top for new entries  
-- **Search Bar** in the header to search by **title, author, or unique ID**  
-- **Filter Section (Left Side)**:
-  - Filter by **Price Range**  
-  - Filter by **Published Date**  
-  - **Reset Button** to clear filters  
-- **Profile Button** (top right) redirects to the user profile page  
+### 👤 Profile Management (After Login)
 
-### 👤 Profile Page
-- Displays:
-  - **Name (editable)**  
-  - **Email (non-editable)**  
-  - **Profile Picture (round shape)** — if no picture, shows default icon  
-- ✏️ **Edit icon** on picture to upload/change image  
-- **Change Password Section**:
-  - Old, New, and Confirm password fields  
-  - Real-time validation:
-    - Must be at least 8 characters  
-    - New and Confirm passwords must match  
-- **Update Button** updates name, picture, and password simultaneously  
+* Update **Name**
+* Update **Password** (requires old password)
+* Upload / Update **Profile Picture**
 
-### ➕ Add Book Page
-- Add new books with:
-  - Title  
-  - Author  
-  - Published Date  
-  - Unique ID  
-- Includes validation for required fields  
+  * Profile picture is uploaded to **AWS S3**
+  * Default profile picture is set initially
 
-### ✏️ Edit Book Page
-- Edit existing books with a pre-filled form  
-- Update and save changes easily  
+### 📚 Book Management
+
+* Add Books
+* Edit Books
+* Delete Books
+* Search Books by:
+
+  * Title
+  * Author
+  * Unique ID
+* Filter Books by:
+
+  * Price Range
+  * Published Date
 
 ---
 
-## 🧠 Tech Stack
+## 🧱 Tech Stack
 
-| Layer | Technology |
-|-------|-------------|
-| **Backend** | Node.js, Express.js |
-| **Frontend (Views)** | EJS Templates, CSS, JavaScript |
-| **Database** | MongoDB (mongoose), AWS S3 (for pics upload) |
-| **Validation** | Zod |
-| **Authentication** | JSON Web Tokens (JWT), bcryptjs |
-| **Security** | Helmet, sanitize-html |
+* **Backend:** Node.js, Express.js
+* **Database:** MongoDB (Mongoose)
+* **Templating Engine:** EJS
+* **Validation:** Zod
+* **Authentication:** JWT + Cookies
+* **File Upload:** Multer + AWS S3
+* **Email Service:** Nodemailer
+* **Security:** Helmet, sanitize-html
+* **Logging:** Morgan
 
 ---
 
-## 🗃️ Folder Structure
+## 📁 Folder Structure
 
-```
-BookStore_Management_System/
+```bash
+BOOKSTORE_MANAGMENT_SYSTEM/
+│
+├── config/
+│   └── aws.js
 │
 ├── controllers/
 │   └── userController.js
@@ -92,6 +73,8 @@ BookStore_Management_System/
 │   └── validation.js
 │
 ├── middleware/
+│   ├── sendEmail.js
+│   ├── upload.js
 │   └── user.js
 │
 ├── models/
@@ -100,80 +83,119 @@ BookStore_Management_System/
 ├── public/
 │   ├── css/
 │   │   └── style.css
-│   │
-│   ├── images/
-│   │   └── default-profile.png
-│   │
 │   └── js/
+│       ├── profilescript.js
 │       └── script.js
 │
 ├── routes/
 │   └── userRoute.js
 │
 ├── views/
-│   ├── partials/
-│   │   ├── footer.ejs
+│   ├── partails/
 │   │   ├── header.ejs
-│   │   ├── addForm.ejs
-│   │   ├── edit.ejs
-│   │   ├── home.ejs
-│   │   ├── login.ejs
-│   │   ├── profile.ejs
-│   │   └── signup.ejs
+│   │   └── footer.ejs
+│   ├── addForm.ejs
+│   ├── Edit.ejs
+│   ├── forgetPassword.ejs
+│   ├── home.ejs
+│   ├── login.ejs
+│   ├── profile.ejs
+│   ├── resetPassword.ejs
+│   └── signup.ejs
 │
 ├── .env
 ├── app.js
-├── package-lock.json
-└── package.json
+├── package.json
+└── README.md
 ```
 
 ---
 
 ## ⚙️ Installation & Setup
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone the Repository
+
 ```bash
-git clone https://github.com/<your-username>/BookStore_Management_System.git
-cd BookStore_Management_System
+git clone <your-repo-url>
+cd BOOKSTORE_MANAGMENT_SYSTEM
 ```
 
-### 2️⃣ Install dependencies
+### 2️⃣ Install Dependencies
+
 ```bash
 npm install
 ```
 
-### 3️⃣ Configure environment variables
-Create a `.env` file in the root directory and add the following:
+### 3️⃣ Create `.env` File
 
-```
-PORT = 3000
-DB_URL = <Your MongoDB Connection String>
+Create a `.env` file in the root directory:
+
+```env
+PORT=
+
+DB_URL=
+
+JWT_SECRET_KEY=
+
+EMAIL_USER=
+EMAIL_PASS=
+
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+AWS_BUCKET_NAME=
 ```
 
-### 4️⃣ Run the application
+> ⚠️ Note: Make sure AWS S3 bucket permissions allow upload & access for profile images.
+
+---
+
+## ▶️ Run Project
+
+Project run hoga:
+
 ```bash
 nodemon app.js
 ```
 
-### 5️⃣ Access the app
-Visit:  
-👉 [http://localhost:3000](http://localhost:3000)
+Or agar nodemon installed nahi hai:
+
+```bash
+npx nodemon app.js
+```
 
 ---
 
-## 🧠 Project Highlights
-- Clean **MVC structure** (Separation of concerns)  
-- **Authentication & Authorization** using JWT  
-- **Data Validation** using Zod  
-- **Secure Input Handling** with `helmet` and `sanitize-html`  
-- **Dynamic EJS views** for user interfaces  
+## 📦 Dependencies
+
+```json
+{
+  "@aws-sdk/client-s3": "^3.975.0",
+  "bcryptjs": "^3.0.3",
+  "body-parser": "^2.2.2",
+  "cookie-parser": "^1.4.7",
+  "dotenv": "^17.2.3",
+  "ejs": "^4.0.1",
+  "express": "^5.2.1",
+  "express-session": "^1.19.0",
+  "helmet": "^8.1.0",
+  "jsonwebtoken": "^9.0.3",
+  "mongoose": "^9.1.5",
+  "morgan": "^1.10.1",
+  "multer": "^2.0.2",
+  "nodemailer": "^7.0.13",
+  "sanitize-html": "^2.17.0",
+  "zod": "^4.3.6"
+}
 
 ---
 
-## 🧑‍💻 Author
+## 👨‍💻 Author
 
-**Muhammad Zohaib Tariq**  
+Developed by **Muhammad Zohaib Tariq**
+ 
 📧 [zohaibtariq566@gmail.com](mailto:zohaibtariq566@gmail.com)  
 🌐 [LinkedIn](https://www.linkedin.com/in/zohaib-tariq-meo)  
 🐱 [GitHub](https://github.com/zabi2223)
+
 
