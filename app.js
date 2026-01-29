@@ -1,7 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import helmet from "helmet";
 import dotenv from "dotenv";
 import connectToDB from "./db config/db.js";
 import userRoute from "./routes/userRoute.js";
@@ -14,7 +13,6 @@ const app = express();
 connectToDB();
 
 app.use(morgan("dev"));
-app.use(helmet());
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(express.json());

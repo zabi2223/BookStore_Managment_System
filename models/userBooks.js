@@ -46,7 +46,13 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true
-    }
+    },
+    pic: {
+        type: String,
+        default: '/images/default-profile.png'
+    },
+    resetToken: { type: String, default: null },
+    resetTokenExpiry: { type: Date, default: null }
 }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
