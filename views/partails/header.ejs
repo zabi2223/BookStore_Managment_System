@@ -7,7 +7,7 @@
         <% if (user) { %>
             <!-- Search Bar -->
             <div class="search-bar">
-                <form action="/search" method="GET">
+                <form action="/search" method="POST">
                     <input type="text" name="query" placeholder="Search by title, author, ID">
                     <button type="submit">Search</button>
                 </form>

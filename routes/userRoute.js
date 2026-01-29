@@ -1,7 +1,6 @@
 import express from "express";
 import {
     createUser,
-    homePage,
     loginPage,
     loginUser,
     logout,
@@ -12,6 +11,15 @@ import {
     sendEmaillink,
     resetPasswordPage,
     resetPasswordSubmit,
+    homePage,
+    addForm,
+    addBook,
+    deleteBook,
+    editForm,
+    editBook,
+    filterBook,
+    searchBook,
+
 } from "../controllers/userController.js";
 import { isUserLoggedIn } from "../middleware/user.js";
 import upload from "../middleware/upload.js";
@@ -28,8 +36,6 @@ route.post('/signup', createUser);
 
 route.get('/logout', isUserLoggedIn, logout);
 
-route.get('/home', isUserLoggedIn, homePage);
-
 route.get('/profile', isUserLoggedIn, profile);
 
 route.get('/forgot-password', forgetpassword);
@@ -41,5 +47,18 @@ route.post("/reset-password/:token", resetPasswordSubmit);
 
 route.post('/updateProfile', isUserLoggedIn, upload.single("pic"), updateProfile);
 
+route.get('/home', isUserLoggedIn, homePage);
+
+route.get('/addBook', isUserLoggedIn, addForm);
+route.post('/addBook', isUserLoggedIn, addBook);
+
+route.post('/deleteBook/:id', isUserLoggedIn, deleteBook);
+
+route.get('/editBook/:id', isUserLoggedIn, editForm);
+route.post('/editBook/:id', isUserLoggedIn, editBook);
+
+route.post('/filter', isUserLoggedIn, filterBook);
+
+route.post('/search', isUserLoggedIn, searchBook)
 
 export default route;

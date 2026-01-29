@@ -3,9 +3,19 @@ import { z } from "zod";
 export const bookValidation = z.object({
     title: z.string().min(3).max(100),
     author: z.string().min(3).max(50),
-    price: z.number().positive(),
-    isbn: z.string().min(5).max(20),
-    publishedDate: z.date().default(() => new Date()),
+    price: z
+        .string()
+        .transform((val) => Number(val))
+        .refine((val) => !isNaN(val) && val > 0, {
+            message: "Price must be a positive number",
+        }),
+    isbn: z.string().min(3).max(20),
+    publishedDate: z
+        .string()
+        .transform((val) => new Date(val))
+        .refine((val) => !isNaN(val.getTime()), {
+            message: "Invalid date format",
+        }),
 });
 
 export const userValidation = z.object({

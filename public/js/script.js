@@ -30,3 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+document.getElementById("resetFilter").addEventListener("click", function () {
+    window.location.href = "/home";
+});

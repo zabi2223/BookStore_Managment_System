@@ -1,6 +1,6 @@
 import { User, Book } from "../models/userBooks.js";
 import bcrypt from 'bcryptjs';
-import { userValidation, loginValidation, profileValidation, emailValidation, resetValidation } from "../input validation/validation.js";
+import { userValidation, loginValidation, profileValidation, emailValidation, resetValidation, bookValidation } from "../input validation/validation.js";
 import sanitizeHtml from "sanitize-html";
 import jwt from "jsonwebtoken";
 import { sendEmail } from "../middleware/sendEmail.js";
@@ -181,8 +181,6 @@ export const updateProfile = async (req, res) => {
 
             await s3.send(command);
 
-            const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
-
             user.pic = key;
         }
 
@@ -237,8 +235,6 @@ export const updateProfile = async (req, res) => {
         res.status(500).render("profile", { message: "Something went wrong" });
     }
 };
-
-
 
 export const forgetpassword = async (req, res) => {
     try {
@@ -295,43 +291,6 @@ export const sendEmaillink = async (req, res) => {
         res.send("Something went wrong");
     }
 };
-
-
-
-export const homePage = async (req, res) => {
-    try {
-        const page = parseInt(req.query.page) || 1;
-        const limit = 5;
-        const skip = (page - 1) * limit;
-
-        const user = await User.findById(req.userId)
-            .populate({
-                path: "books",
-                options: { skip, limit, sort: { publishedDate: -1 } }
-            })
-            .exec();
-
-        if (!user) return res.redirect('/?message=User+not+found');
-
-        const totalBooks = user.books.length;
-        const totalPages = Math.ceil(totalBooks / limit);
-
-        const message = req.query.message;
-
-        res.render("home", {
-            user,
-            books: user.books,
-            currentPage: page,
-            totalPages,
-            message
-        });
-
-    } catch (error) {
-        console.error(error);
-        res.send("Something went wrong");
-    }
-};
-
 
 export const resetPasswordPage = async (req, res) => {
     try {
@@ -391,6 +350,256 @@ export const resetPasswordSubmit = async (req, res) => {
         await user.save();
 
         return res.redirect("/?message=" + encodeURIComponent("Password reset successful ✅"));
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong");
+    }
+};
+
+export const homePage = async (req, res) => {
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = 5;
+        const skip = (page - 1) * limit;
+
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=' + encodeURIComponent('User not found'));
+
+        // Count total books for this user
+        const totalBooks = await Book.countDocuments({ userId: user._id });
+        const totalPages = Math.ceil(totalBooks / limit);
+
+        // Fetch paginated books separately
+        const books = await Book.find({ userId: user._id })
+            .sort({ publishedDate: -1 })
+            .skip(skip)
+            .limit(limit)
+            .exec();
+
+        const message = req.query.message;
+
+        const minPrice = null;
+        const maxPrice = null;
+
+        res.render("home", {
+            user,
+            books,
+            currentPage: page,
+            totalPages,
+            message,
+            minPrice,
+            maxPrice
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong");
+    }
+};
+
+export const addForm = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+
+        const message = req.query.message;
+        res.render("addForm", { user, message });
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong");
+    }
+};
+
+export const addBook = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+
+        const result = bookValidation.safeParse(req.body);
+
+        if (!result.success) {
+            const errorMessages = result.error.issues.map(err => `${err.path[0]}: ${err.message}`).join(", ");
+            return res.redirect(`/addBook?message=` + encodeURIComponent(errorMessages));
+        }
+
+        const { title, author, price, isbn, publishedDate } = result.data;
+
+        const cleantitle = sanitizeHtml(title, { allowedTags: [], allowedAttributes: {} });
+        const cleanauthor = sanitizeHtml(author, { allowedTags: [], allowedAttributes: {} });
+        const cleanprice = sanitizeHtml(price, { allowedTags: [], allowedAttributes: {} });
+        const cleanisbn = sanitizeHtml(isbn, { allowedTags: [], allowedAttributes: {} });
+
+        const existingBook = await Book.findOne({ isbn: cleanisbn });
+        if (existingBook) {
+            return res.redirect(`/addBook?message=` + encodeURIComponent("Book with this ID already exists"));
+        }
+
+        const newBook = new Book({
+            title: cleantitle,
+            author: cleanauthor,
+            price: cleanprice,
+            isbn: cleanisbn,
+            publishedDate,
+            userId: user._id
+        });
+
+        await newBook.save();
+
+        res.redirect("/home?message=" + encodeURIComponent("Book added successfully!"));
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong in add book");
+    }
+};
+
+export const deleteBook = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+        const page = req.query.page;
+        const { id } = req.params;
+        const deletedBook = await Book.findOneAndDelete({ _id: id, userId: user._id });
+
+        if (!deletedBook) {
+            return res.redirect("/home?page=" + page + "&message=" + encodeURIComponent("Book not found."));
+        }
+
+        res.redirect("/home?page=" + page + "&message=" + encodeURIComponent("Book delete successfully!"));
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong in add book");
+    }
+};
+
+export const editForm = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+
+        const page = req.query.page;
+        const { id } = req.params;
+        const existBook = await Book.findOne({ _id: id, userId: user._id });
+
+        if (!existBook) {
+            return res.redirect("/home?page=" + page + "&message=" + encodeURIComponent("Book not found."));
+        }
+
+        const message = req.query.message;
+        res.render("editForm", { page, existBook, user, message });
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong");
+    }
+};
+
+export const editBook = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+        const page = req.query.page;
+        const { id } = req.params;
+
+        const existBook = await Book.findOne({ _id: id, userId: user._id });
+
+        if (!existBook) {
+            return res.redirect("/home?page=" + page + "&message=" + encodeURIComponent("Book not found."));
+        }
+        const result = bookValidation.safeParse(req.body);
+
+        if (!result.success) {
+            const errorMessages = result.error.issues.map(err => `${err.path[0]}: ${err.message}`).join(", ");
+            return res.redirect("/editBook/${id}?page=" + page + "&message=" + encodeURIComponent(errorMessages));
+        }
+
+        const { title, author, price, isbn, publishedDate } = result.data;
+
+        const cleantitle = sanitizeHtml(title, { allowedTags: [], allowedAttributes: {} });
+        const cleanauthor = sanitizeHtml(author, { allowedTags: [], allowedAttributes: {} });
+        const cleanprice = sanitizeHtml(price, { allowedTags: [], allowedAttributes: {} });
+        const cleanisbn = sanitizeHtml(isbn, { allowedTags: [], allowedAttributes: {} });
+
+        const existingBook = await Book.findOne({ isbn: cleanisbn, _id: { $ne: id } });
+        if (existingBook) {
+            return res.redirect(`/editBook/${id}?page=${page}&message=${encodeURIComponent("Book with this ID already exists")}`);
+        }
+
+        existBook.title = cleantitle;
+        existBook.author = cleanauthor;
+        existBook.price = cleanprice;
+        existBook.isbn = cleanisbn;
+        existBook.publishedDate = publishedDate;
+        await existBook.save();
+
+        res.redirect(`/editBook/${id}?page=${page}&message=${encodeURIComponent("Book Update successfully!")}`);
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong in add book");
+    }
+};
+
+export const filterBook = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+
+        const { minPrice, maxPrice } = req.body;
+
+        let query = { userId: user._id };
+
+        if (minPrice || maxPrice) {
+            query.price = {};
+            if (minPrice) query.price.$gte = Number(minPrice);
+            if (maxPrice) query.price.$lte = Number(maxPrice);
+        }
+
+        const books = await Book.find(query);
+
+        const message = req.query.message;
+        res.render("home", {
+            user,
+            books,
+            currentPage: 1,
+            totalPages: null,
+            message,
+            minPrice,
+            maxPrice
+        });
+    } catch (error) {
+        console.error(error);
+        res.send("Something went wrong");
+    }
+};
+
+export const searchBook = async (req, res) => {
+    try {
+        const user = await User.findById(req.userId);
+        if (!user) return res.redirect('/?message=User+not+found');
+
+        const { query } = req.body;
+
+        if (!query || query.trim() === "") {
+            return res.redirect("/home?message=" + encodeURIComponent("Empty searching"));
+        }
+
+        const books = await Book.find({
+            userId: user._id,
+            $or: [
+                { title: { $regex: query, $options: "i" } },
+                { author: { $regex: query, $options: "i" } },
+                { isbn: { $regex: query, $options: "i" } }
+            ]
+        });
+
+        const message = req.query.message;
+        res.render("home", {
+            user,
+            books,
+            currentPage: 1,
+            totalPages: null,
+            message,
+            minPrice: 0,
+            maxPrice: 0
+        });
     } catch (error) {
         console.error(error);
         res.send("Something went wrong");

@@ -65,10 +65,6 @@ userSchema.virtual("books", {
     foreignField: "userId"
 });
 
-// Virtual property: total number of books
-userSchema.virtual("bookCount").get(function () {
-    return this.books ? this.books.length : 0;
-});
 
 userSchema.virtual("picUrl").get(function () {
     if (!this.pic) {

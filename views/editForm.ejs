@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Add Book</title>
+    <title>Edit Book</title>
     <style>
         /* Reset & Base */
         * {
@@ -170,28 +170,29 @@
 
 <body>
     <%- include('partails/header') %>
-
         <div class="page-wrapper">
             <div class="form-container">
-                <a href="/home" class="back-btn">← Back</a>
-                <h2>Add New Book</h2>
-                <form action="/addBook" method="POST">
-                    <input type="text" name="title" placeholder="Title" required>
-                    <input type="text" name="author" placeholder="Author" required>
-                    <input type="number" name="price" placeholder="Price" min="1" required>
-                    <input type="text" name="isbn" placeholder="Unique ID" required>
-                    <input type="date" name="publishedDate" required>
-                    <button type="submit">Add Book</button>
+                <a href="/home?page=<%= page %>" class="back-btn">← Back</a>
+                <h2>Edit Book</h2>
+                <form action="/editBook/<%= existBook._id %>?page=<%= page %>" method="POST">
+                    <input type="text" name="title" value="<%= existBook.title %>" placeholder="Enter title" required>
+                    <input type="text" name="author" value="<%= existBook.author %>" placeholder="Enter author"
+                        required>
+                    <input type="number" name="price" value="<%= existBook.price %>" min="1" placeholder="Enter price"
+                        required>
+                    <input type="text" name="isbn" value="<%= existBook.isbn %>" placeholder="Enter ISBN" required>
+                    <input type="date" name="publishedDate"
+                        value="<%= existBook.publishedDate.toISOString().slice(0,10) %>" required>
+                    <button type="submit">Update</button>
                 </form>
+
             </div>
         </div>
-
         <% if (typeof message !=='undefined' ) { %>
             <div id="notification" class="notification">
                 <%= message %>
             </div>
             <% } %>
-
                 <script src="/js/script.js"></script>
 </body>
 
