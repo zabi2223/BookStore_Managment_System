@@ -192,10 +192,11 @@ npx nodemon app.js
 
 ## 👨‍💻 Author
 
-**Muhammad Zohaib Tariq**
-* 📧 [[zohaibtariq566@gmail.com](mailto:zohaibtariq566@gmail.com)]
-* 🌐 [[www.linkedin.com/in/zohaib-tariq-meo](http://www.linkedin.com/in/zohaib-tariq-meo)]
-* 🐱 [[https://github.com/zabi2223](https://github.com/zabi2223)]
+Developed by **Muhammad Zohaib Tariq**
+ 
+📧 [zohaibtariq566@gmail.com](mailto:zohaibtariq566@gmail.com)  
+🌐 [LinkedIn](https://www.linkedin.com/in/zohaib-tariq-meo)  
+🐱 [GitHub](https://github.com/zabi2223)
 
 
  
