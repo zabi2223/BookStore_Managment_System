@@ -14,7 +14,7 @@ import {
     resetPasswordSubmit,
 } from "../controllers/userController.js";
 import { isUserLoggedIn } from "../middleware/user.js";
-import { handleProfileUpload } from "../middleware/upload.js";
+import upload from "../middleware/upload.js";
 
 const route = express.Router();
 
@@ -39,7 +39,7 @@ route.post('/forgot-password', sendEmaillink);
 route.get("/reset-password/:token", resetPasswordPage);
 route.post("/reset-password/:token", resetPasswordSubmit);
 
-route.post('/updateProfile', isUserLoggedIn, handleProfileUpload, updateProfile);
+route.post('/updateProfile', isUserLoggedIn, upload.single("pic"), updateProfile);
 
 
 export default route;

@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
     },
     pic: {
         type: String,
-        default: '/images/default-profile.png'
+        default: null
     },
     resetToken: { type: String, default: null },
     resetTokenExpiry: { type: Date, default: null }
@@ -69,5 +69,14 @@ userSchema.virtual("books", {
 userSchema.virtual("bookCount").get(function () {
     return this.books ? this.books.length : 0;
 });
+
+userSchema.virtual("picUrl").get(function () {
+    if (!this.pic) {
+        return "https://media.istockphoto.com/id/1300845620/vector/user-icon-flat-isolated-on-white-background-user-symbol-vector-illustration.jpg?s=1024x1024&w=is&k=20&c=-mUWsTSENkugJ3qs5covpaj-bhYpxXY-v9RDpzsw504=";
+    }
+
+    return `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${this.pic}`;
+});
+
 
 export const User = mongoose.model("User", userSchema);

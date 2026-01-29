@@ -3,12 +3,12 @@ import bcrypt from 'bcryptjs';
 import { userValidation, loginValidation, profileValidation, emailValidation, resetValidation } from "../input validation/validation.js";
 import sanitizeHtml from "sanitize-html";
 import jwt from "jsonwebtoken";
-import multer from "multer";
 import { sendEmail } from "../middleware/sendEmail.js";
 import crypto from "crypto";
 
-const storage = multer.memoryStorage();
-export const upload = multer({ storage });
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import s3 from "../config/aws.js";
+
 
 export const loginPage = async (req, res) => {
     try {
@@ -132,11 +132,7 @@ export const profile = async (req, res) => {
         const message = req.query.message;
 
         res.render("profile", {
-            user: {
-                name: user.name,
-                email: user.email,
-                pic: user.pic || '/images/default-profile.png'
-            },
+            user,
             message
         });
 
@@ -172,10 +168,26 @@ export const updateProfile = async (req, res) => {
         user.name = cleanName;
 
         if (req.file) {
-            user.pic = req.file.location;
+            const fileExt = req.file.originalname.split(".").pop();
+
+            const key = `users/${user._id}/${Date.now()}.${fileExt}`;
+
+            const command = new PutObjectCommand({
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: key,
+                Body: req.file.buffer,
+                ContentType: req.file.mimetype,
+            });
+
+            await s3.send(command);
+
+            const imageUrl = `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`;
+
+            user.pic = key;
         }
+
         if (!req.file) {
-            console.log("No Image");
+            return res.status(404).send("No Image save");
         }
 
         if (newPassword || oldPassword || confirmPassword) {
@@ -307,13 +319,7 @@ export const homePage = async (req, res) => {
         const message = req.query.message;
 
         res.render("home", {
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                pic: user.pic || '/images/default-profile.png',
-                books: user.books
-            },
+            user,
             books: user.books,
             currentPage: page,
             totalPages,

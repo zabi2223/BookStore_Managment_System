@@ -5,8 +5,6 @@ import dotenv from "dotenv";
 import connectToDB from "./db config/db.js";
 import userRoute from "./routes/userRoute.js";
 
-dotenv.config();
-
 const PORT = process.env.PORT || 3000;
 
 const app = express();
@@ -27,6 +25,7 @@ app.use((req, res, next) => {
 
 app.use(cookieParser());
 
+dotenv.config();
 app.use('/', userRoute);
 
 
