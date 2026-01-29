@@ -20,7 +20,6 @@ export const loginPage = async (req, res) => {
     }
 };
 
-
 export const loginUser = async (req, res) => {
     try {
         const result = loginValidation.safeParse(req.body);
@@ -66,7 +65,6 @@ export const loginUser = async (req, res) => {
     }
 };
 
-
 export const signUpPage = async (req, res) => {
     try {
         const message = req.query.message;
@@ -78,7 +76,6 @@ export const signUpPage = async (req, res) => {
 
     }
 };
-
 
 export const createUser = async (req, res) => {
     try {
@@ -112,7 +109,6 @@ export const createUser = async (req, res) => {
         res.status(500).send("Something went wrong");
     }
 };
-
 
 export const logout = async (req, res) => {
     res.clearCookie("token");
